@@ -1,15 +1,21 @@
 import React, { useEffect, useState, useNavigate } from 'react'
 import ChoiceForm from './UserChoice';
+import { useToggle } from "./Toggle";
 
 const Home = () => {
+
   const [comChoice, setComChoice] = useState(null);
   const [userChoice, setUserChoice] = useState(null);
   const [winner, setWinner] = useState("Who Will Win?");
+  const [showClass, toggleClass] = useToggle(false);
+  const [userCount, setUserCount] = useState(0);
+  const [computerCount, setComputerCount] = useState(0);
+  const [tieCount, setTieCount] = useState(0);
   
   
   useEffect(() => {
     getComputerChoice();
-  }, []);
+  }, [userChoice]);
 
   useEffect(()=> {
     { userChoice ? getWinner() : console.log('waiting for choice to be made') };
@@ -40,29 +46,39 @@ const Home = () => {
     switch (true) {
       case userChoice === comChoice:
         setWinner("Tie!")
+        setTieCount(tieCount + 1)
         break;
       case userChoice === 'Paper' || 'paper': 
         if (comChoice === "Rock"){
         setWinner("You Won!")
+        setUserCount(userCount + 1)
+
           break;
       } else if (comChoice === "Scissors"){
         setWinner('You Lost!')
+        setComputerCount(computerCount + 1)
+
         break;
       } 
       case userChoice === 'Rock' || 'rock': 
         if (comChoice === "Paper"){
-        setWinner("You Lost!")
+          setWinner("You Lost!")
+          setComputerCount(computerCount + 1)
         break;
+        setUserCount(userCount + 1)
       } else if (comChoice === "Scissors"){
         setWinner("You Won!")
+        setUserCount(userCount + 1)
         break;
       } 
       case userChoice === 'Scissors' || 'scissors': 
         if (comChoice === "Rock"){
-        setWinner("You Lost!")
+          setWinner("You Lost!")
+          setComputerCount(computerCount + 1)
         break;
       } else if (comChoice === "Scissors"){
         setWinner("You Won!")
+        setUserCount(userCount + 1)
         break;
       } 
       default:
@@ -73,11 +89,14 @@ const Home = () => {
     return (
       <div> 
         <h1> Welcome! </h1>
-        <button> Click to begin (Toggle Here) </button>
+        <button onClick={toggleClass}> Click to begin </button>
+        {showClass && <ChoiceForm getUserChoice={getUserChoice}/>}
         <h2>{userChoice? (`Computer Choice: ${comChoice}`) : "Computer Choice: "}</h2>   
         <h2>{userChoice? (`User Choice: ${userChoice}`) : "User Choice: "}</h2>   
         <h3>{winner}</h3>
-        <ChoiceForm getUserChoice={getUserChoice}/>
+        <h4> Computer Wins: {computerCount}</h4>
+        <h4> User Wins: {userCount}</h4>
+        <h4> Ties: {tieCount} </h4>
       </div>
     )
 };
